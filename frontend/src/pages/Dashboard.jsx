@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -70,8 +71,14 @@ export default function Dashboard() {
             </div>
 
             {/* Tabela de lançamentos recentes */}
-            <h2 className="text-lg front-semibold mb-3 text-gray-800 dark:text-gray-100">
+            <h2 className="text-lg front-semibold mb-3 text-gray-800 dark:text-gray-100 flex items-center justify-between">
                 Lançamentos Recentes
+                <Link
+                    to="/lancamentos"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                    Ver todos
+                </Link>
             </h2>
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow overflow-x-auto">
                 <table className="min-w-full text-sm text-left">
