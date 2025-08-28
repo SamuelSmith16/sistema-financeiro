@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import {
     BanknotesIcon,
     ArrowTrendingUpIcon,
@@ -6,6 +8,14 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function Dashboard() {
+    const [recentes, setRecentes] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/lancamentos?limit=5")
+        .then(res => setRecentes(res.data))
+        .catch(err => console.error(err));
+    }, []);
+
     const cards = [
         {
             title: "Saldo Total",
@@ -36,6 +46,8 @@ export default function Dashboard() {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Dashboard</h1>
+
+            {/* Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {cards.map((card, index) => (
                     <div
@@ -55,6 +67,50 @@ export default function Dashboard() {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* Tabela de lançamentos recentes */}
+            <h2 className="text-lg front-semibold mb-3 text-gray-800 dark:text-gray-100">
+                Lançamentos Recentes
+            </h2>
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow overflow-x-auto">
+                <table className="min-w-full text-sm text-left">
+                    <thead  className="bg-gray-200 dark:bg-gray-700">
+                        <tr>
+                            <th className="py-3 px-4 text-gray-900 dark:text-gray-50 font-semibold">Descrição</th>
+                            <th className="py-3 px-4 text-gray-900 dark:text-gray-50 font-semibold">Valor</th>
+                            <th className="py-3 px-4 text-gray-900 dark:text-gray-50 font-semibold">Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {recentes.map((l, idx) => (
+                            <tr 
+                                key={l._id}
+                                className={`transition-colors duration-200 ${
+                                    idx % 2 === 0
+                                        ? "bg-gray-50 dark:bg-gray-800"
+                                        : "bg-white dark:bg-gary-900"
+                                } hover:bg-gray-100 dark:hover:bg-gray-700`}
+                                >
+                                    <td className="py-2 px-4 text-gray-800 dark:text-gray-100">{l.descricao}</td>
+                                    <td className="py-2 px-4 text-gray-800 dark:text-gray-100">R$ {l.valor}</td>
+                                    <td className="py-2 px-4 text-gray-800 dark:text-gray-100">
+                                    {new Date(l.data).toLocaleDateString("pt-BR")}
+                                </td>
+                            </tr>
+                        ))}
+                        {recentes.length === 0 && (
+                            <tr>
+                                <td 
+                                    colSpan="3"
+                                    className="py-3 px-4 text-gray-500 dark:text-gray-400 text-center"
+                                    >
+                                    Nenhum lançamento encontrado.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
