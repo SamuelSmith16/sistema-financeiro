@@ -1,9 +1,22 @@
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Dashboard from "./pages/Dashboard";
+import Lancamentos from "./pages/Lancamentos";
+import Cartoes from "./pages/Cartoes";
+import Simulacoes from "./pages/Simulacoes";
+
 export default function App() {
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600">
-        Tailwind 4 funcionando! 🚀
-      </h1>
-    </div>
-  )
+    <Router>
+      <Navbar />
+      <div className="p-6">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/lancamentos" element={<Lancamentos />} />
+          <Route path="/cartoes" element={<Cartoes />} />
+          <Route path="/simulacoes" element={<Simulacoes />} />
+        </Routes>
+      </div>
+    </Router>
+  );
 }
