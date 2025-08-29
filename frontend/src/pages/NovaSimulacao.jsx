@@ -25,6 +25,12 @@ export default function NovaSimulacao() {
             return;
         }
 
+        const payload = {
+            titulo: titulo.trim(),
+            valor_total: valorNum,
+            quantidade_parcelas: parcelasNum,
+        };
+
         // Só envia juros se o usuário preencher
         if (jurosAoMes !== "") {
             const jurosNum = Number(jurosAoMes);
@@ -36,12 +42,7 @@ export default function NovaSimulacao() {
         }
 
         try {
-            await api.post("/api/simulacoes", {
-                titulo: titulo.trim(),
-                valor_total: valorNum,
-                quantidade_parcelas: parcelasNum,
-                juros_ao_mes: jurosNum
-            });
+            await api.post("/api/simulacoes", payload);
             navigate("/simulacoes");
         } catch (err) {
             console.error(err);
@@ -73,6 +74,7 @@ function Input({ label, type = "text", value, onChange, step, min }) {
                 min={min}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
+                required
                 className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
         </div>
