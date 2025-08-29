@@ -11,5 +11,15 @@ export function agruparPorCategoria(lancamentos) {
 }
 
 export function calcularSaldoPorMes(lancamentos) {
-  // lógica para calcular saldo acumulado por mês
+  const saldos = {};
+
+  lancamentos.forEach(l => {
+    const data = new Date(l.data);
+    const mes = data.toLocaleString("pt-BR", { month: "short" });
+
+    const valor = l.tipo === "Receita" ? l.valor : -l.valor;
+    saldos[mes] = (saldos[mes] || 0) + valor;
+  });
+
+  return Object.entries(saldos).map(([mes, saldo]) => ({ mes, saldo }));
 }
