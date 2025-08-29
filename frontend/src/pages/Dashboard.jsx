@@ -8,7 +8,7 @@ export default function Dashboard() {
   const [lancamentos, setLancamentos] = useState([]);
 
   useEffect(() => {
-    fetch("https://<seu-backend>.onrender.com/lancamentos")
+    fetch("https://sistema-financeiro-gngw.onrender.com/api/lancamentos")
       .then(res => res.json())
       .then(data => setLancamentos(data))
       .catch(err => console.error("Erro ao buscar lançamentos", err));
