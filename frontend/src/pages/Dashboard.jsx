@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import api from "../services/api";
 import {
     BanknotesIcon,
@@ -23,7 +22,7 @@ export default function Dashboard() {
     const [recentes, setRecentes] = useState([]);
 
     useEffect(() => {
-        api.get("/api/lancamentos")
+        api.get("/api/lancamentos?limit=5")
         .then(res => setRecentes(res.data))
         .catch(err => console.error(err));
     }, []);

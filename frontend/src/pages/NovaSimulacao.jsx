@@ -12,7 +12,11 @@ export default function NovaSimulacao() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post("/api/simulacoes", { tipo, valor, parcelas });
+            await api.post("/api/simulacoes", { 
+                tipo, 
+                valor: parseFloat(valor), 
+                parcelas: parseInt(parcelas), 
+             });
             navigate("/simulacoes");
         } catch (err) {
             console.error(err);

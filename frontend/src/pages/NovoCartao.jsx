@@ -12,7 +12,11 @@ export default function NovoCartao() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post("/api/cartoes", { nome, limite, vencimento });
+            await api.post("/api/cartoes", { 
+                nome, 
+                limite: parseFloat(limite), 
+                vencimento: parseInt(vencimento), 
+             });
             navigate("/cartoes");
         } catch (err) {
             console.error(err);
