@@ -57,7 +57,7 @@ export default function NovaSimulacao() {
                 <Input label="Título" value={titulo} onChange={setTitulo} />
                 <Input label="Valor Total (R$)" type="number" step="0.01" value={valorTotal} onChange={setValorTotal} />
                 <Input label="Quantidade de Parcelas" type="number" min="1" value={quantidadeParcelas} onChange={setQuantidadeParcelas} />
-                <Input label="Juros ao mês (%)" type="number" step="0.01" min="0" value={jurosAoMes} onChange={setJurosAoMes} />
+                <Input label="Juros ao mês (%)" type="number" step="0.01" min="0" value={jurosAoMes} onChange={setJurosAoMes} required={false}/>
                 <SubmitButton cor="yellow" />
             </form>
         </div>
@@ -74,7 +74,7 @@ function Input({ label, type = "text", value, onChange, step, min }) {
                 min={min}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                required
+                required={required}
                 className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
         </div>
