@@ -12,7 +12,7 @@ export default function NovaSimulacao() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!titulo || !valorTotal || !quantidadeParcelas || jurosAoMes === "") {
+    if (!titulo || !valorTotal || !quantidadeParcelas === "") {
       alert("Preencha todos os campos obrigatórios");
       return;
     }
