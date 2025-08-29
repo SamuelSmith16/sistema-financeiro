@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import CardBase from "../ui/CardBase";
 
 export default function GraficoSaldoPorMes({ dados }) {
     if (!dados || dados.length === 0) {
@@ -6,8 +7,7 @@ export default function GraficoSaldoPorMes({ dados }) {
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-md shadow-md p-4">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-4">Saldo por Mês</h2>
+        <CardBase title="Saldo por Mês">
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={dados}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -17,6 +17,6 @@ export default function GraficoSaldoPorMes({ dados }) {
                     <Line type="monotone" dataKey="saldo" stroke="#8884d8" strokeWidth={2} />
                 </LineChart>
             </ResponsiveContainer>
-        </div>
+        </CardBase>
     );
 }

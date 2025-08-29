@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import CardBase from "../ui/CardBase";
 
 const cores = [
   "#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#8dd1e1", "#a4de6c", "#d0ed57", "#ffbb28"
@@ -10,8 +11,7 @@ export default function GraficoDespesasPorCategoria({ dados }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-md shadow-md p-4">
-      <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-4">Despesas por Categoria</h2>
+    <CardBase title="Despesas por Categoria">
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
@@ -31,6 +31,6 @@ export default function GraficoDespesasPorCategoria({ dados }) {
           <Legend />
         </PieChart>
       </ResponsiveContainer>
-    </div>
+    </CardBase>
   );
 }
