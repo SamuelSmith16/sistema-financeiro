@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import api from "../services/api";
 import {
     BanknotesIcon,
     ArrowTrendingUpIcon,
@@ -22,7 +23,7 @@ export default function Dashboard() {
     const [recentes, setRecentes] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:5000/api/lancamentos?limit=5")
+        api.get("/api/lancamentos")
         .then(res => setRecentes(res.data))
         .catch(err => console.error(err));
     }, []);

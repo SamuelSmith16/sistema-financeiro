@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function NovaSimulacao() {
     const [tipo, setTipo] = useState("parcelamento");
@@ -11,11 +12,7 @@ export default function NovaSimulacao() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/api/simulacoes", {
-                tipo,
-                valor: parseFloat(valor),
-                parcelas: parseInt(parcelas)
-            });
+            await api.post("/api/simulacoes", { tipo, valor, parcelas });
             navigate("/simulacoes");
         } catch (err) {
             console.error(err);

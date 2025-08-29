@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function NovoCartao() {
     const [nome, setNome] = useState("");
@@ -11,11 +12,7 @@ export default function NovoCartao() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/api/cartoes", {
-                nome,
-                limite: parseFloat(limite),
-                vencimento
-            });
+            await api.post("/api/cartoes", { nome, limite, vencimento });
             navigate("/cartoes");
         } catch (err) {
             console.error(err);

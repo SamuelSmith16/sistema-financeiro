@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function NovoLancamento() {
     const [descricao, setDescricao] = useState("");
@@ -11,11 +12,7 @@ export default function NovoLancamento() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/api/lancamentos", {
-                descricao,
-                valor: parseFloat(valor),
-                data,
-            });
+            await api.post("/api/lancamentos", { descricao, valor, data });
             navigate("/lancamentos");
         } catch (error) {
             console.error(err);
