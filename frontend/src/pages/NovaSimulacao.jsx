@@ -73,7 +73,6 @@ function Input({ label, type = "text", value, onChange, step, min }) {
                 min={min}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                required
                 className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             />
         </div>
