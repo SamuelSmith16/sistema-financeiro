@@ -54,9 +54,9 @@ export default function NovaSimulacao() {
         <div className="max-w-lg mx-auto">
             <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Nova Simulação</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <Input label="Título" value={titulo} onChange={setTitulo} />
-                <Input label="Valor Total (R$)" type="number" step="0.01" value={valorTotal} onChange={setValorTotal} />
-                <Input label="Quantidade de Parcelas" type="number" min="1" value={quantidadeParcelas} onChange={setQuantidadeParcelas} />
+                <Input label="Título" value={titulo} onChange={setTitulo} required={true} />
+                <Input label="Valor Total (R$)" type="number" step="0.01" value={valorTotal} onChange={setValorTotal} required={true} />
+                <Input label="Quantidade de Parcelas" type="number" min="1" value={quantidadeParcelas} onChange={setQuantidadeParcelas} required={true} />
                 <Input label="Juros ao mês (%)" type="number" step="0.01" min="0" value={jurosAoMes} onChange={setJurosAoMes} required={false}/>
                 <SubmitButton cor="yellow" />
             </form>
