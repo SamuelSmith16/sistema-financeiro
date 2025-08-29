@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import GraficoDespesasPorCategoria from "../components/GraficoDespesasPorCategoria";
 import {
     BanknotesIcon,
     ArrowTrendingUpIcon,
@@ -12,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Função para formatar valores monetários
-const formatCurrency = (value) => 
+const formatCurrency = (value) =>
     new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
@@ -23,9 +24,25 @@ export default function Dashboard() {
 
     useEffect(() => {
         api.get("/api/lancamentos?limit=5")
-        .then(res => setRecentes(res.data))
-        .catch(err => console.error(err));
+            .then(res => setRecentes(res.data))
+            .catch(err => console.error(err));
     }, []);
+
+    function agruparPorCategoria(lancamentos) {
+        const despesas = lancamentos.filter(l => l.tipo === "Despesa");
+        const agrupado = {};
+
+        despesas.forEach(({ categoria, valor }) => {
+            if (!agrupado[categoria]) agrupado[categoria] = 0;
+            agrupado[categoria] += valor;
+        });
+
+        return Object.entries(agrupado).map(([categoria, valor]) => ({ categoria, valor }));
+    }
+
+    const dadosGrafico = agruparPorCategoria(lancamentos);
+
+    <GraficoDespesasPorCategoria dados={dadosGrafico} />
 
     const cards = [
         {
@@ -120,7 +137,7 @@ export default function Dashboard() {
 
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow overflow-x-auto max-h-96">
                 <table className="min-w-full text-sm text-left">
-                    <thead  className="sticky top-0 z-10 bg-gray-200 dark:bg-gray-700">
+                    <thead className="sticky top-0 z-10 bg-gray-200 dark:bg-gray-700">
                         <tr>
                             <th className="py-3 px-4 text-gray-900 dark:text-gray-50 font-semibold">Descrição</th>
                             <th className="py-3 px-4 text-gray-900 dark:text-gray-50 font-semibold">Valor</th>
@@ -129,29 +146,28 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                         {recentes.map((l, idx) => (
-                            <tr 
+                            <tr
                                 key={l._id}
-                                className={`transition-colors duration-200 ${
-                                    idx % 2 === 0
-                                        ? "bg-gray-50 dark:bg-gray-800"
-                                        : "bg-white dark:bg-gray-900"
-                                } hover:bg-gray-100 dark:hover:bg-gray-700`}
-                                >
-                                    <td className="py-2 px-4 text-gray-800 dark:text-gray-100">{l.descricao}</td>
-                                    <td className="py-2 px-4 text-gray-800 dark:text-gray-100">
-                                        {formatCurrency(l.valor)}
-                                    </td>
-                                    <td className="py-2 px-4 text-gray-600 dark:text-gray-300">
+                                className={`transition-colors duration-200 ${idx % 2 === 0
+                                    ? "bg-gray-50 dark:bg-gray-800"
+                                    : "bg-white dark:bg-gray-900"
+                                    } hover:bg-gray-100 dark:hover:bg-gray-700`}
+                            >
+                                <td className="py-2 px-4 text-gray-800 dark:text-gray-100">{l.descricao}</td>
+                                <td className="py-2 px-4 text-gray-800 dark:text-gray-100">
+                                    {formatCurrency(l.valor)}
+                                </td>
+                                <td className="py-2 px-4 text-gray-600 dark:text-gray-300">
                                     {new Date(l.data).toLocaleDateString("pt-BR")}
                                 </td>
                             </tr>
                         ))}
                         {recentes.length === 0 && (
                             <tr>
-                                <td 
+                                <td
                                     colSpan="3"
                                     className="py-3 px-4 text-gray-500 dark:text-gray-400 text-center"
-                                    >
+                                >
                                     Nenhum lançamento encontrado.
                                 </td>
                             </tr>

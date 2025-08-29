@@ -1,28 +1,12 @@
 const express = require('express');
 const Simulacao = require('../models/Simulacao');
+const { calcularJurosAoMes } = require('../utils/calculos');
 const router = express.Router();
-
-function calcularJurosAoMes(valor_total, quantidade_parcelas, valor_parcela) {
-    let taxa = 0.01; // 1% incial
-    let tolerancia = 0.000001;
-    let maxIteracoes = 10000;
-
-    for (let i = 0; i < maxIteracoes; i++) {
-        let valorCalculado = valor_total * (taxa * Math.pow(1 + taxa, quantidade_parcelas)) / (Math.pow(1 + taxa, quantidade_parcelas) - 1);
-        let erro = valor_parcela - valorCalculado;
-
-        if (Math.abs(erro) < tolerancia) break;
-
-        taxa += erro / 1000; // ajuste gradual para convergência
-    }
-
-    return taxa * 100; // retorna % ao mês
-}
 
 // Criar simulação (POST)
 router.post('/', async (req, res) => {
   try {
-    let { titulo, valor_total, quantidade_parcelas, juros_ao_mes } = req.body;
+    let { titulo, valor_total, quantidade_parcelas, juros_ao_mes, valor_parcela } = req.body;
 
     // Validação mínima
     if (!titulo || !valor_total || !quantidade_parcelas) {
@@ -37,7 +21,6 @@ router.post('/', async (req, res) => {
     }
 
     // Se o frontend enviar juros_ao_mes, usamos ele
-    let valor_parcela;
     if (juros_ao_mes !== undefined && juros_ao_mes !== "") {
       juros_ao_mes = Number(juros_ao_mes);
       if (juros_ao_mes < 0) {
@@ -47,7 +30,7 @@ router.post('/', async (req, res) => {
       const totalComJuros = valor_total * Math.pow(1 + taxa, quantidade_parcelas);
       valor_parcela = totalComJuros / quantidade_parcelas;
     } else {
-      // Se não vier juros, usamos uma taxa padrão (ex: 2%)
+      // Se não vier juros, usamos uma taxa padrão
       const taxaPadrao = 0.02;
       const totalComJuros = valor_total * Math.pow(1 + taxaPadrao, quantidade_parcelas);
       valor_parcela = totalComJuros / quantidade_parcelas;
@@ -72,37 +55,36 @@ router.post('/', async (req, res) => {
   }
 });
 
-
 // Listar simulações (GET)
 router.get('/', async (req, res) => {
-    try {
-        const simulacoes = await Simulacao.find();
-        res.json(simulacoes);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+  try {
+    const simulacoes = await Simulacao.find();
+    res.json(simulacoes);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
-// Atualizar simulações (PUT)
+// Atualizar simulação (PUT)
 router.put('/:id', async (req, res) => {
-    try {
-        const atualizado = await Simulacao.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!atualizado) return res.status(404).json({ error: 'Simulação não encontrada' });
-        res.json(atualizado);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+  try {
+    const atualizado = await Simulacao.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!atualizado) return res.status(404).json({ error: 'Simulação não encontrada' });
+    res.json(atualizado);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
-// Deletar simulações (DELET)
+// Deletar simulação (DELETE)
 router.delete('/:id', async (req, res) => {
-    try {
-        const removido = await Simulacao.findByIdAndDelete(req.params.id);
-        if (!removido) return res.status(404).json({ error: 'Simulação não encontrada' });
-        res.json({ message: 'Simulação removida com sucesso' });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+  try {
+    const removido = await Simulacao.findByIdAndDelete(req.params.id);
+    if (!removido) return res.status(404).json({ error: 'Simulação não encontrada' });
+    res.json({ message: 'Simulação removida com sucesso' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 module.exports = router;
