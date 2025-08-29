@@ -6,16 +6,38 @@ import { agruparPorCategoria, calcularSaldoPorMes } from "../utils/agrupadores";
 
 export default function Dashboard() {
   const [lancamentos, setLancamentos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch("https://sistema-financeiro-gngw.onrender.com/api/lancamentos")
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Erro ao buscar lançamentos");
+        return res.json();
+      })
       .then(data => setLancamentos(data))
-      .catch(err => console.error("Erro ao buscar lançamentos", err));
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const dadosPizza = agruparPorCategoria(lancamentos);
   const dadosLinha = calcularSaldoPorMes(lancamentos);
+
+  if (loading) {
+    return (
+      <div className="p-6 text-center text-gray-600 dark:text-gray-300">
+        <span className="animate-pulse">Carregando dados...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-600 dark:text-red-400">
+        Erro: {error}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
