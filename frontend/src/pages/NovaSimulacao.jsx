@@ -1,93 +1,70 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import Input from "../components/form/Input";
 
 export default function NovaSimulacao() {
-    const [titulo, setTitulo] = useState("");
-    const [valorTotal, setValorTotal] = useState("");
-    const [quantidadeParcelas, setQuantidadeParcelas] = useState("");
-    const [jurosAoMes, setJurosAoMes] = useState("");
-    const navigate = useNavigate();
+  const [form, setForm] = useState({
+    titulo: "",
+    valor_total: "",
+    quantidade_parcelas: "",
+    juros_ao_mes: ""
+  });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const [errors, setErrors] = useState({});
+  const [success, setSuccess] = useState("");
+  const [apiError, setApiError] = useState("");
 
-        if (!titulo || !valorTotal || !quantidadeParcelas) {
-            alert("Preencha todos os campos obrigatórios");
-            return;
-        }
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
 
-        const valorNum = Number(valorTotal);
-        const parcelasNum = Number(quantidadeParcelas);
+  const validar = () => {
+    const novosErros = {};
+    if (!form.titulo.trim()) novosErros.titulo = "Título é obrigatório";
+    if (!form.valor_total || Number(form.valor_total) <= 0) novosErros.valor_total = "Valor deve ser maior que zero";
+    if (!form.quantidade_parcelas || Number(form.quantidade_parcelas) < 1) novosErros.quantidade_parcelas = "Parcelas deve ser >= 1";
+    return novosErros;
+  };
 
-        if (valorNum <= 0 || parcelasNum < 1) {
-            alert("Verifique os valores inseridos");
-            return;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const novosErros = validar();
+    if (Object.keys(novosErros).length > 0) {
+      setErrors(novosErros);
+      return;
+    }
 
-        const payload = {
-            titulo: titulo.trim(),
-            valor_total: valorNum,
-            quantidade_parcelas: parcelasNum,
-        };
+    try {
+      const res = await fetch("https://<seu-backend>.onrender.com/simulacoes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form)
+      });
 
-        // Só envia juros se o usuário preencher
-        if (jurosAoMes !== "") {
-            const jurosNum = Number(jurosAoMes);
-            if (jurosNum < 0) {
-                alert("Juros ao mês não pode ser negativo");
-                return;
-            }
-            payload.juros_ao_mes = jurosNum;
-        }
+      if (!res.ok) throw new Error("Erro ao salvar simulação");
 
-        try {
-            await api.post("/api/simulacoes", payload);
-            navigate("/simulacoes");
-        } catch (err) {
-            console.error(err);
-            alert("Erro ao criar simulação");
-        }
-    };
+      setSuccess("Simulação salva com sucesso!");
+      setForm({ titulo: "", valor_total: "", quantidade_parcelas: "", juros_ao_mes: "" });
+    } catch (err) {
+      setApiError(err.message);
+    }
+  };
 
-    return (
-        <div className="max-w-lg mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Nova Simulação</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <Input label="Título" value={titulo} onChange={setTitulo} required={true} />
-                <Input label="Valor Total (R$)" type="number" step="0.01" value={valorTotal} onChange={setValorTotal} required={true} />
-                <Input label="Quantidade de Parcelas" type="number" min="1" value={quantidadeParcelas} onChange={setQuantidadeParcelas} required={true} />
-                <Input label="Juros ao mês (%)" type="number" step="0.01" min="0" value={jurosAoMes} onChange={setJurosAoMes} required={false} />
-                <SubmitButton cor="yellow" />
-            </form>
-        </div>
-    );
-}
+  return (
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-md shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Nova Simulação</h2>
 
-function Input({ label, type = "text", value, onChange, step, min, required }) {
-    return (
-        <div>
-            <label className="block text-sm font-medium mb-1">{label}</label>
-            <input
-                type={type}
-                step={step}
-                min={min}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                required={required}
-                className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-            />
-        </div>
-    );
-}
+      <Input label="Título" name="titulo" value={form.titulo} onChange={handleChange} required error={errors.titulo} />
+      <Input label="Valor Total" name="valor_total" value={form.valor_total} onChange={handleChange} required error={errors.valor_total} />
+      <Input label="Parcelas" name="quantidade_parcelas" value={form.quantidade_parcelas} onChange={handleChange} required error={errors.quantidade_parcelas} />
+      <Input label="Juros ao mês (%)" name="juros_ao_mes" value={form.juros_ao_mes} onChange={handleChange} />
 
-function SubmitButton({ cor }) {
-    const cores = {
-        yellow: "bg-yellow-500 hover:bg-yellow-600"
-    };
-    return (
-        <button type="submit" className={`w-full ${cores[cor]} text-white py-2 rounded transition-colors`}>
-            Salvar
-        </button>
-    );
+      <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+        Salvar
+      </button>
+
+      {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
+      {apiError && <p className="text-red-500 text-sm mt-2">{apiError}</p>}
+    </form>
+  );
 }
