@@ -57,14 +57,14 @@ export default function NovaSimulacao() {
                 <Input label="Título" value={titulo} onChange={setTitulo} required={true} />
                 <Input label="Valor Total (R$)" type="number" step="0.01" value={valorTotal} onChange={setValorTotal} required={true} />
                 <Input label="Quantidade de Parcelas" type="number" min="1" value={quantidadeParcelas} onChange={setQuantidadeParcelas} required={true} />
-                <Input label="Juros ao mês (%)" type="number" step="0.01" min="0" value={jurosAoMes} onChange={setJurosAoMes} required={false}/>
+                <Input label="Juros ao mês (%)" type="number" step="0.01" min="0" value={jurosAoMes} onChange={setJurosAoMes} required={false} />
                 <SubmitButton cor="yellow" />
             </form>
         </div>
     );
 }
 
-function Input({ label, type = "text", value, onChange, step, min }) {
+function Input({ label, type = "text", value, onChange, step, min, required }) {
     return (
         <div>
             <label className="block text-sm font-medium mb-1">{label}</label>
