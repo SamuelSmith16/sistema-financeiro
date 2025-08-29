@@ -134,7 +134,7 @@ export default function Dashboard() {
                                 className={`transition-colors duration-200 ${
                                     idx % 2 === 0
                                         ? "bg-gray-50 dark:bg-gray-800"
-                                        : "bg-white dark:bg-gary-900"
+                                        : "bg-white dark:bg-gray-900"
                                 } hover:bg-gray-100 dark:hover:bg-gray-700`}
                                 >
                                     <td className="py-2 px-4 text-gray-800 dark:text-gray-100">{l.descricao}</td>
