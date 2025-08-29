@@ -1,116 +1,102 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import Input from "../components/form/Input";
 
 export default function NovoCartao() {
-    const [banco, setBanco] = useState("");
-    const [numero, setNumero] = useState("");
-    const [limite, setLimite] = useState("");
-    const [vencimentoFatura, setVencimentoFatura] = useState("");
-    const [melhorDataCompra, setMelhorDataCompra] = useState("");
-    const [tipo, setTipo] = useState("Crédito");
-    const navigate = useNavigate();
+    const [form, setForm] = useState({
+        banco: "",
+        numero: "",
+        limite: "",
+        vencimento_fatura: "",
+        melhor_data_compra: "",
+        tipo: ""
+    });
+
+    const [errors, setErrors] = useState({});
+    const [success, setSuccess] = useState("");
+    const [apiError, setApiError] = useState("");
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" });
+    };
+
+    const validar = () => {
+        const novosErros = {};
+        if (!form.banco.trim()) novosErros.banco = "Banco é obrigatório";
+        if (!form.numero.trim()) novosErros.numero = "Número do cartão é obrigatório";
+        if (!form.limite || Number(form.limite) <= 0) novosErros.limite = "Limite deve ser maior que zero";
+        if (!form.vencimento_fatura || Number(form.vencimento_fatura) < 1 || Number(form.vencimento_fatura) > 31)
+            novosErros.vencimento_fatura = "Vencimento deve estar entre 1 e 31";
+        if (!form.melhor_data_compra || Number(form.melhor_data_compra) < 1 || Number(form.melhor_data_compra) > 31)
+            novosErros.melhor_data_compra = "Melhor data deve estar entre 1 e 31";
+        if (!["Crédito", "Débito", "Pré-pago"].includes(form.tipo)) novosErros.tipo = "Tipo inválido";
+        return novosErros;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Validação básica
-        if (!banco || !numero || !limite || !vencimentoFatura || !melhorDataCompra || !tipo) {
-            alert("Preencha todos os campos obrigatórios");
-            return;
-        }
-
-        const limiteNum = Number(limite);
-        const vencNum = Number(vencimentoFatura);
-        const melhorNum = Number(melhorDataCompra);
-
-        if (isNaN(limiteNum) || limiteNum <= 0) {
-            alert("O limite deve ser um número maior que zero");
-            return;
-        }
-        if (vencNum < 1 || vencNum > 31) {
-            alert("O vencimento da fatura deve ser entre 1 e 31");
-            return;
-        }
-        if (melhorNum < 1 || melhorNum > 31) {
-            alert("A melhor data de compra deve ser entre 1 e 31");
+        const novosErros = validar();
+        if (Object.keys(novosErros).length > 0) {
+            setErrors(novosErros);
             return;
         }
 
         try {
-            await api.post("/api/cartoes", {
-                banco,
-                numero,
-                limite: limiteNum,
-                vencimento_fatura: vencNum,
-                melhor_data_compra: melhorNum,
-                tipo
+            const res = await fetch("https://<seu-backend>.onrender.com/cartoes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(form)
             });
-            navigate("/cartoes");
+
+            if (!res.ok) throw new Error("Erro ao salvar cartão");
+
+            setSuccess("Cartão salvo com sucesso!");
+            setForm({
+                banco: "",
+                numero: "",
+                limite: "",
+                vencimento_fatura: "",
+                melhor_data_compra: "",
+                tipo: ""
+            });
         } catch (err) {
-            console.error(err);
-            alert("Erro ao cadastrar cartão");
+            setApiError(err.message);
         }
     };
 
     return (
-        <div className="max-w-lg mx-auto">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Novo Cartão</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <Input label="Banco" value={banco} onChange={setBanco} />
-                <Input label="Número do cartão" value={numero} onChange={setNumero} />
-                <Input label="Limite (R$)" type="number" step="0.01" value={limite} onChange={setLimite} />
-                <Input label="Vencimento da fatura" type="number" min="1" max="31" value={vencimentoFatura} onChange={setVencimentoFatura} />
-                <Input label="Melhor data de compra" type="number" min="1" max="31" value={melhorDataCompra} onChange={setMelhorDataCompra} />
-                <Select label="Tipo" value={tipo} onChange={setTipo} options={["Crédito", "Débito", "Múltiplo"]} />
-                <SubmitButton cor="green" />
-            </form>
-        </div>
-    );
-}
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-md shadow-md space-y-4">
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Novo Cartão</h2>
 
-function Input({ label, type = "text", value, onChange, step, min, max }) {
-    return (
-        <div>
-            <label className="block text-sm font-medium mb-1">{label}</label>
-            <input
-                type={type}
-                step={step}
-                min={min}
-                max={max}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                required
-                className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-            />
-        </div>
-    );
-}
+            <Input label="Banco" name="banco" value={form.banco} onChange={handleChange} required error={errors.banco} />
+            <Input label="Número do Cartão" name="numero" value={form.numero} onChange={handleChange} required error={errors.numero} />
+            <Input label="Limite" name="limite" value={form.limite} onChange={handleChange} required error={errors.limite} />
+            <Input label="Vencimento da Fatura" name="vencimento_fatura" value={form.vencimento_fatura} onChange={handleChange} required error={errors.vencimento_fatura} />
+            <Input label="Melhor Data de Compra" name="melhor_data_compra" value={form.melhor_data_compra} onChange={handleChange} required error={errors.melhor_data_compra} />
 
-function Select({ label, value, onChange, options }) {
-    return (
-        <div>
-            <label className="block text-sm font-medium mb-1">{label}</label>
-            <select
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-full p-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-            >
-                {options.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                ))}
-            </select>
-        </div>
-    );
-}
+            <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tipo</label>
+                <select
+                    name="tipo"
+                    value={form.tipo}
+                    onChange={handleChange}
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none ${errors.tipo ? "border-red-500" : "border-gray-300"
+                        }`}
+                >
+                    <option value="">Selecione</option>
+                    <option value="Crédito">Crédito</option>
+                    <option value="Débito">Débito</option>
+                    <option value="Pré-pago">Pré-pago</option>
+                </select>
+                {errors.tipo && <p className="text-red-500 text-xs mt-1">{errors.tipo}</p>}
+            </div>
 
-function SubmitButton({ cor }) {
-    const cores = {
-        green: "bg-green-500 hover:bg-green-600"
-    };
-    return (
-        <button type="submit" className={`w-full ${cores[cor]} text-white py-2 rounded transition-colors`}>
-            Salvar
-        </button>
+            <button type="submit" className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700">
+                Salvar
+            </button>
+
+            {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
+            {apiError && <p className="text-red-500 text-sm mt-2">{apiError}</p>}
+        </form>
     );
 }
