@@ -8,9 +8,10 @@ export default function Dashboard() {
   const [lancamentos, setLancamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const baseURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch("https://sistema-financeiro-gngw.onrender.com/api/lancamentos")
+    fetch(`${baseURL}/api/lancamentos`)
       .then(res => {
         if (!res.ok) throw new Error("Erro ao buscar lançamentos");
         return res.json();

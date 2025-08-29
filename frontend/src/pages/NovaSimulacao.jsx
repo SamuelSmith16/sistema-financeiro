@@ -13,6 +13,7 @@ export default function NovoLancamento() {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState("");
     const [apiError, setApiError] = useState("");
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,7 +39,7 @@ export default function NovoLancamento() {
         }
 
         try {
-            const res = await fetch("https://<seu-backend>.onrender.com/lancamentos", {
+            const res = await fetch(`${baseURL}/api/lancamentos`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)

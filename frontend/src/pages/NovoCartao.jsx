@@ -14,6 +14,7 @@ export default function NovoCartao() {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState("");
     const [apiError, setApiError] = useState("");
+    const baseURL = import.meta.env.VITE_API_URL;
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -42,7 +43,7 @@ export default function NovoCartao() {
         }
 
         try {
-            const res = await fetch("https://<seu-backend>.onrender.com/cartoes", {
+            const res = await fetch(`${baseURL}/api/cartoes`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form)
